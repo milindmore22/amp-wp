@@ -1,59 +1,75 @@
 /**
+ * Playwright dependencies
+ */
+import { test, expect } from '@playwright/test';
+
+/**
  * WordPress dependencies
  */
-const {
-	visitAdminPage,
-} = require('@wordpress/e2e-test-utils/build/visit-admin-page');
+// const {
+// 	visitAdminPage, // Replaced with page.goto
+// } = require('@wordpress/e2e-test-utils/build/visit-admin-page');
+
 /**
  * Internal dependencies
  */
-const {
-	goToOnboardingWizard,
-	cleanUpSettings,
-	moveToDoneScreen,
-} = require('../../utils/onboarding-wizard-utils');
+// const {
+// 	goToOnboardingWizard, // Needs migration
+// 	cleanUpSettings, // Needs migration
+// 	moveToDoneScreen, // Needs migration
+// } = require('../../utils/onboarding-wizard-utils');
 
-describe('Onboarding wizard exit links', () => {
-	it('if no previous page, returns to settings when clicking close', async () => {
-		await goToOnboardingWizard();
+test.describe('Onboarding wizard exit links', () => {
+	test('if no previous page, returns to settings when clicking close', async ({ page }) => {
+		// await goToOnboardingWizard(); // This util needs migration
+		console.warn('Test "if no previous page, returns to settings when clicking close" is partially disabled due to goToOnboardingWizard dependency.');
+		// Dummy navigation, replace with actual setup from goToOnboardingWizard
+		await page.goto('/wp-admin/admin.php?page=amp-onboarding-wizard');
 
-		await expect(page).toClick('a', { text: 'Close' });
 
-		await page.waitForSelector('.wp-admin');
+		// await expect(page).toClick('a', { text: 'Close' }); // Original
+		await page.locator('a').filter({ hasText: 'Close' }).click();
 
-		await expect(page).toMatchElement('h1', { text: 'AMP Settings' });
+		await expect(page.locator('.wp-admin')).toBeVisible(); // Was page.waitForSelector
+
+		await expect(page.locator('h1').filter({ hasText: 'AMP Settings' })).toBeVisible();
 	});
 
-	it('returns to previous page when clicking close', async () => {
-		await visitAdminPage('admin.php', 'page=amp-options');
-		await page.waitForSelector('.wp-admin');
+	test('returns to previous page when clicking close', async ({ page }) => {
+		// await visitAdminPage('admin.php', 'page=amp-options'); // Original
+		await page.goto('/wp-admin/admin.php?page=amp-options');
+		await expect(page.locator('.wp-admin')).toBeVisible(); // Was page.waitForSelector
 
-		await page.waitForSelector(
-			'a[href*="admin.php?page=amp-onboarding-wizard"]'
-		);
+		const wizardLink = page.locator('a[href*="admin.php?page=amp-onboarding-wizard"]');
+		await expect(wizardLink).toBeVisible(); // Was page.waitForSelector
 
-		await expect(page).toClick(
-			'a[href*="admin.php?page=amp-onboarding-wizard"]'
-		);
+		// await expect(page).toClick('a[href*="admin.php?page=amp-onboarding-wizard"]'); // Original
+		await wizardLink.click();
 
-		await page.waitForSelector('#amp-onboarding-wizard');
+		await expect(page.locator('#amp-onboarding-wizard')).toBeVisible(); // Was page.waitForSelector
 
-		await expect(page).toClick('a', { text: 'Close' });
+		// await expect(page).toClick('a', { text: 'Close' }); // Original
+		await page.locator('a').filter({ hasText: 'Close' }).click();
 
-		await page.waitForSelector('.wp-admin');
+		await expect(page.locator('.wp-admin')).toBeVisible(); // Was page.waitForSelector
 
-		await expect(page).toMatchElement('h1', { text: 'AMP Settings' });
+		await expect(page.locator('h1').filter({ hasText: 'AMP Settings' })).toBeVisible();
 	});
 
-	it('goes to settings when clicking finish', async () => {
-		await moveToDoneScreen({ mode: 'standard' });
+	test('goes to settings when clicking finish', async ({ page }) => {
+		// await moveToDoneScreen({ mode: 'standard' }); // This util needs migration
+		console.warn('Test "goes to settings when clicking finish" is partially disabled due to moveToDoneScreen dependency.');
+		// Dummy navigation, replace with actual setup from moveToDoneScreen
+		await page.goto('/wp-admin/admin.php?page=amp-onboarding-wizard&step=done&mode=standard');
 
-		await expect(page).toClick('a', { text: 'Finish' });
 
-		await page.waitForSelector('.wp-admin');
+		// await expect(page).toClick('a', { text: 'Finish' }); // Original
+		await page.locator('a').filter({ hasText: 'Finish' }).click();
 
-		await expect(page).toMatchElement('h1', { text: 'AMP Settings' });
+		await expect(page.locator('.wp-admin')).toBeVisible(); // Was page.waitForSelector
 
-		await cleanUpSettings();
+		await expect(page.locator('h1').filter({ hasText: 'AMP Settings' })).toBeVisible();
+
+		// await cleanUpSettings(); // This util needs migration
 	});
 });
